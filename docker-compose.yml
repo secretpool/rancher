@@ -1,5 +1,21 @@
+rancher-registry:
+  image: registry:2
+  restart: always
+  volumes:
+    - /opt/docker-registry/data:/var/lib/registry
+    - /opt/docker-registry/auth:/auth
+    - /opt/docker-registry/certs:/certs
+  environment:
+    VIRTUAL_HOST: registry.secretpool.org
+    LETSENCRYPT_HOST: registry.secretpool.org
+    LETSENCRYPT_EMAIL: admin@secretpool.org
+    REGISTRY_AUTH: htpasswd
+    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+
 rancher-nginx:
   image: jwilder/nginx-proxy:latest
+  restart: always
   ports:
    - '80:80'
    - '443:443'
@@ -8,15 +24,19 @@ rancher-nginx:
     - '/etc/nginx/vhost.d'
     - '/usr/share/nginx/html'
     - '/var/run/docker.sock:/tmp/docker.sock:ro'
+
 rancher-letsencrypt:
   image: jrcs/letsencrypt-nginx-proxy-companion:latest
+  restart: always
   volumes_from:
     - rancher-nginx
   volumes:
     - '/home/docker/nginx-proxy/ssl:/etc/nginx/certs:rw'
     - '/var/run/docker.sock:/var/run/docker.sock:ro'
+
 rancher-server:
   image: rancher/server:latest
+  restart: always
   environment:
     VIRTUAL_PORT: 8080
     VIRTUAL_HOST: rancher.secretpool.org
