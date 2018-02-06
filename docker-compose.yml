@@ -1,4 +1,4 @@
-rancher-registry:
+registry:
   image: registry:2
   restart: always
   volumes:
@@ -13,7 +13,7 @@ rancher-registry:
     REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
     REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
 
-rancher-nginx:
+nginx:
   image: jwilder/nginx-proxy:latest
   restart: always
   ports:
@@ -25,7 +25,7 @@ rancher-nginx:
     - '/usr/share/nginx/html'
     - '/var/run/docker.sock:/tmp/docker.sock:ro'
 
-rancher-letsencrypt:
+letsencrypt:
   image: jrcs/letsencrypt-nginx-proxy-companion:latest
   restart: always
   volumes_from:
@@ -34,8 +34,8 @@ rancher-letsencrypt:
     - '/home/docker/nginx-proxy/ssl:/etc/nginx/certs:rw'
     - '/var/run/docker.sock:/var/run/docker.sock:ro'
 
-rancher-server:
-  image: rancher/server:latest
+rancher:
+  image: rancher/server:preview
   restart: always
   environment:
     VIRTUAL_PORT: 8080
