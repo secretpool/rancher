@@ -29,12 +29,12 @@ letsencrypt:
   image: jrcs/letsencrypt-nginx-proxy-companion:latest
   restart: always
   volumes_from:
-    - rancher-nginx
+    - nginx
   volumes:
     - '/home/docker/nginx-proxy/ssl:/etc/nginx/certs:rw'
     - '/var/run/docker.sock:/var/run/docker.sock:ro'
 
-rancher:
+server:
   image: rancher/server:preview
   restart: always
   environment:
