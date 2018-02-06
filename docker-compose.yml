@@ -1,45 +1,72 @@
-registry:
-  image: registry:2
-  restart: unless-stopped
-  volumes:
-    - /opt/docker-registry/data:/var/lib/registry
-    - /opt/docker-registry/auth:/auth
-    - /opt/docker-registry/certs:/certs
-  environment:
-    VIRTUAL_HOST: registry.secretpool.org
-    LETSENCRYPT_HOST: registry.secretpool.org
-    LETSENCRYPT_EMAIL: admin@secretpool.org
-    REGISTRY_AUTH: htpasswd
-    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
-    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+version: '3'
 
-nginx:
-  image: jwilder/nginx-proxy:latest
-  restart: unless-stopped
-  ports:
-   - '80:80'
-   - '443:443'
-  volumes:
-    - '/home/docker/nginx-proxy/ssl:/etc/nginx/certs:ro'
-    - '/etc/nginx/vhost.d'
-    - '/usr/share/nginx/html'
-    - '/var/run/docker.sock:/tmp/docker.sock:ro'
+networks:
+  net:
 
-letsencrypt:
-  image: jrcs/letsencrypt-nginx-proxy-companion:latest
-  restart: unless-stopped
-  volumes_from:
-    - nginx
-  volumes:
-    - '/home/docker/nginx-proxy/ssl:/etc/nginx/certs:rw'
-    - '/var/run/docker.sock:/var/run/docker.sock:ro'
+volumes:
+  rancher:
+  registry:
+  nginx-certs:
+  nginx-html:
+  nginx-vhost:
 
-server:
-  image: rancher/server:preview
-  restart: unless-stopped
-  environment:
-    VIRTUAL_HOST: rancher.secretpool.org
-    LETSENCRYPT_HOST: rancher.secretpool.org
-    LETSENCRYPT_EMAIL: admin@secretpool.org
-  volumes:
-    - '/home/docker/rancher-server/mysql:/var/lib/mysql:rw'
+services:
+  registry:
+    image: registry:2
+    restart: unless-stopped
+    networks:
+      - net
+    volumes:
+      - registry:/var/lib/registry
+      - registry:/auth
+      - registry:/certs
+    environment:
+      VIRTUAL_HOST: registry.secretpool.org
+      LETSENCRYPT_HOST: registry.secretpool.org
+      LETSENCRYPT_EMAIL: admin@secretpool.org
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+
+  nginx:
+    image: jwilder/nginx-proxy:latest
+    restart: unless-stopped
+    networks:
+      - net
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: 'true'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - nginx-certs:/etc/nginx/certs:ro
+      - nginx-html:/usr/share/nginx/html
+      - nginx-vhost:/etc/nginx/vhost.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    restart: unless-stopped
+    networks:
+      - net
+    volumes:
+      - nginx-certs:/etc/nginx/certs:rw
+      - nginx-html:/usr/share/nginx/html:rw
+      - nginx-vhost:/etc/nginx/vhost.d:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  server:
+    image: rancher/server:preview
+    restart: unless-stopped
+    networks:
+      - net
+    expose:
+      - '443/tcp'
+    environment:
+      VIRTUAL_PORT: 443
+      VIRTUAL_PROTO: https
+      VIRTUAL_HOST: rancher.secretpool.org
+      LETSENCRYPT_HOST: rancher.secretpool.org
+      LETSENCRYPT_EMAIL: admin@secretpool.org
+    volumes:
+      - rancher:/var/lib/mysql:rw
