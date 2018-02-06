@@ -38,7 +38,6 @@ server:
   image: rancher/server:preview
   restart: unless-stopped
   environment:
-    VIRTUAL_PORT: 443
     VIRTUAL_HOST: rancher.secretpool.org
     LETSENCRYPT_HOST: rancher.secretpool.org
     LETSENCRYPT_EMAIL: admin@secretpool.org

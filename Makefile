@@ -25,13 +25,13 @@ deploy:
 
 create-password:
 	docker run --entrypoint htpasswd registry:2 -Bbn admin wMl2?5VgSuEaVCbC > auth/htpasswd
-	docker cp auth/htpasswd rancher_rancher-registry_1:/auth
+	docker cp auth/htpasswd rancher_registry_1:/auth
 
 logs:
 	docker-compose logs -f
 
 ssh:
-	docker exec -it rancher_rancher-registry_1 bash
+	docker exec -it rancher_registry_1 bash
 
 provision-server:
 	docker-machine create \
