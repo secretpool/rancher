@@ -1,6 +1,6 @@
 registry:
   image: registry:2
-  restart: always
+  restart: unless-stopped
   volumes:
     - /opt/docker-registry/data:/var/lib/registry
     - /opt/docker-registry/auth:/auth
@@ -15,7 +15,7 @@ registry:
 
 nginx:
   image: jwilder/nginx-proxy:latest
-  restart: always
+  restart: unless-stopped
   ports:
    - '80:80'
    - '443:443'
@@ -27,7 +27,7 @@ nginx:
 
 letsencrypt:
   image: jrcs/letsencrypt-nginx-proxy-companion:latest
-  restart: always
+  restart: unless-stopped
   volumes_from:
     - nginx
   volumes:
@@ -36,9 +36,9 @@ letsencrypt:
 
 server:
   image: rancher/server:preview
-  restart: always
+  restart: unless-stopped
   environment:
-    VIRTUAL_PORT: 8080
+    VIRTUAL_PORT: 443
     VIRTUAL_HOST: rancher.secretpool.org
     LETSENCRYPT_HOST: rancher.secretpool.org
     LETSENCRYPT_EMAIL: admin@secretpool.org
