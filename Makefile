@@ -29,9 +29,10 @@ rm:
 				 rancher_registry_1 \
 				 rancher_server_1
 
-create-password:
+init-registry:
 	docker run --entrypoint htpasswd registry:2 -Bbn admin wMl2?5VgSuEaVCbC > auth/htpasswd
 	docker cp auth/htpasswd rancher_registry_1:/auth
+	docker cp etc/r.secretpool.org rancher_registry_1:/etc/nginx/vhost.d
 
 provision-server:
 	docker-machine create \

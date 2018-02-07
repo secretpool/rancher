@@ -20,6 +20,7 @@ services:
       - registry:/var/lib/registry
       - registry:/auth
       - registry:/certs
+      - nginx-vhost:/etc/nginx/vhost.d:rw
     environment:
       VIRTUAL_HOST: r.secretpool.org
       LETSENCRYPT_HOST: r.secretpool.org
