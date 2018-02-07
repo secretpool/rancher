@@ -46,4 +46,4 @@ logs:
 	docker-compose logs -f
 
 ssh:
-	docker exec -it rancher_server_1 bash
+	docker exec -it rancher_nginx_1 bash
