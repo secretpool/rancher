@@ -21,8 +21,8 @@ services:
       - registry:/auth
       - registry:/certs
     environment:
-      VIRTUAL_HOST: registry.secretpool.org
-      LETSENCRYPT_HOST: registry.secretpool.org
+      VIRTUAL_HOST: r.secretpool.org
+      LETSENCRYPT_HOST: r.secretpool.org
       LETSENCRYPT_EMAIL: admin@secretpool.org
       REGISTRY_AUTH: htpasswd
       REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
