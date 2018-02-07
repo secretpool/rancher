@@ -42,8 +42,16 @@ provision-server:
 		--digitalocean-size $(machine_size) \
 		$(machine)
 
+reset-password:
+	docker exec -it rancher_server_1 kubectl -s localhost:8081 delete user --all
+	docker exec -it rancher_server_1 kubectl -s localhost:8081 delete globalrolebindings --all
+	docker restart rancher_server_1
+
 logs:
 	docker-compose logs -f
 
-ssh:
+ssh-nginx:
 	docker exec -it rancher_nginx_1 bash
+
+ssh-rancher:
+	docker exec -it rancher_server_1 bash
